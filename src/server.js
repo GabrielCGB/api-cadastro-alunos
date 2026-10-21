@@ -82,7 +82,7 @@ app.post("/alunos", (req, res) => {
         })
     }
 
-    //validadndo a idade
+    //validando a idade
     if(
         typeof idade !== "number" || idade < 0 || idade > 100) {
         return res.status(400).json({
@@ -90,7 +90,7 @@ app.post("/alunos", (req, res) => {
         })
     }
 
-    //cadastra finalmente o alunooo
+    //cadastra finalmente o aluno
     const novoAluno = {
         id: alunos.length + 1,
         nome: req.body.nome,
@@ -103,6 +103,89 @@ app.post("/alunos", (req, res) => {
     res.status(201).json(novoAluno)
 
 })
+
+
+app.put('/alunos/:id', (req,res) => {
+    const id = Number(req.params.id)
+    const {nome, idade, email, curso} = req.body
+    const aluno = alunos.find(aluno => aluno.id === id);
+
+    if (!aluno) {
+        return res.status(404).json({
+            mensagem: "Aluno não encontrado"
+        });
+    }
+
+    if (nome === undefined || idade === undefined || email === undefined || curso === undefined){
+        return res.status(400).json({
+            mensagem: "Todos os campos são obrigatórios"
+        });
+    }
+    
+    aluno.nome = nome;
+    aluno.idade = idade;
+    aluno.email = email;
+    aluno.curso = curso;
+
+
+return res.status(201).json(aluno);
+
+});
+
+app.patch('/alunos/:id', (req, res) => {
+    const id = Number(req.params.id);
+
+    const aluno = alunos.find(aluno => aluno.id === id);
+
+
+    if (!aluno) {
+        return res.status(404).json({
+            mensagem: "aluno não encontrado"
+        });
+    }
+
+    if (req.body.nome !== undefined) {
+        aluno.nome = req.body.nome;
+    }
+
+    if (req.body.idade !== undefined) {
+        aluno.idade = req.body.idade;
+    }
+
+    if (req.body.email !== undefined) {
+        aluno.email = req.body.email;
+    }
+
+    if (req.body.curso !== undefined) {
+        aluno.curso = req.body.curso;
+    }
+
+    return res.json(aluno);
+});
+
+app.delete('/alunos/:id', (req, res) => {
+    const id = Number(req.params.id);
+
+    const indice = alunos.findIndex(aluno => aluno.id === id);
+
+    if (indice === -1) {
+        return res.status(404).json({
+            mensagem: "aluno não encontrado"
+        });
+    }
+
+    const aluno = alunos[indice]
+
+    alunos.splice(indice, 1)
+
+    return res.json({
+        mensagem: "Aluno excluído com sucesso!",
+        aluno: aluno
+    })
+});
+
+
+
 
 app.listen(3000, () => {
     console.log("Api rodando em http://localhost:3000")
